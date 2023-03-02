@@ -11,17 +11,17 @@ import * as bcrypt from 'bcrypt';
 import { IsEmail, IsEnum, IsBoolean, IsString } from 'class-validator';
 
 import { CoreEntity } from './../../common/entities/core.entity';
-import { Restaurant} from 'src/restaurants/entities/restaurant.entity';
+import { Restaurant } from 'src/restaurants/entities/restaurant.entity';
 
 export enum UserRole {
   Owner = 'Owner',
   Client = 'Client',
-  Delivery ='Delivery',
+  Delivery = 'Delivery',
 }
 
 registerEnumType(UserRole, { name: 'UserRole' });
 
-@InputType( 'UserInputType' ,{ isAbstract: true })
+@InputType('UserInputType', { isAbstract: true })
 @ObjectType()
 @Entity()
 export class User extends CoreEntity {
@@ -30,7 +30,7 @@ export class User extends CoreEntity {
   @IsEmail()
   email: string;
 
-  @Column({select: false})
+  @Column({ select: false })
   @Field((type) => String)
   @IsString()
   password: string;
@@ -49,10 +49,7 @@ export class User extends CoreEntity {
   verified: boolean;
 
   @Field((type) => [Restaurant])
-  @OneToMany(
-    (type) => Restaurant,
-    (restaurant) => restaurant.owner,
-  )
+  @OneToMany((type) => Restaurant, (restaurant) => restaurant.owner)
   restaurants: Restaurant[];
 
   @BeforeInsert()

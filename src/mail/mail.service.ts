@@ -11,37 +11,45 @@ export class MailService {
     @Inject(CONFIG_OPTIONS) private readonly options: MailModuleOptions,
   ) {}
 
-    async sendEmail(
-        subject: string,
-        template: string,
-        emailVariables: EmailVariables[]
-        ): Promise<boolean> {
-        const form = new FormData();
-        form.append('from', `Santiago at Uber Eats <mailgun@${this.options.domain}>`);
-        form.append('to', `${this.options.fromEmail}`);
-        form.append('subject', subject);
-        form.append('template', template);
-        emailVariables.forEach(emailVar => form.append(`v:${emailVar.key}`, emailVar.value));
+  async sendEmail(
+    subject: string,
+    template: string,
+    emailVariables: EmailVariables[],
+  ): Promise<boolean> {
+    const form = new FormData();
+    form.append(
+      'from',
+      `Santiago at Uber Eats <mailgun@${this.options.domain}>`,
+    );
+    form.append('to', `${this.options.fromEmail}`);
+    form.append('subject', subject);
+    form.append('template', template);
+    emailVariables.forEach((emailVar) =>
+      form.append(`v:${emailVar.key}`, emailVar.value),
+    );
 
-        try {
-           await got.post(`https://api.mailgun.net/v3/${this.options.domain}/messages`,
-           {
-                headers: {
-                    'Authorization': `Basic ${Buffer.from(`api:${this.options.apiKey}`).toString('base64')}`
-                },
-                body: form
-            }
-            );
-            return true;
-        } catch (error) {
-            return false;
-        }
+    try {
+      await got.post(
+        `https://api.mailgun.net/v3/${this.options.domain}/messages`,
+        {
+          headers: {
+            Authorization: `Basic ${Buffer.from(
+              `api:${this.options.apiKey}`,
+            ).toString('base64')}`,
+          },
+          body: form,
+        },
+      );
+      return true;
+    } catch (error) {
+      return false;
     }
+  }
 
-    sendVerificationEmail(email: string, code: string) {
-        this.sendEmail('Verify Your Email', 'verify-email', [
-            {key: 'code', value: code},
-            {key: 'username', value: email}
-        ])
-    }
+  sendVerificationEmail(email: string, code: string) {
+    this.sendEmail('Verify Your Email', 'verify-email', [
+      { key: 'code', value: code },
+      { key: 'username', value: email },
+    ]);
+  }
 }

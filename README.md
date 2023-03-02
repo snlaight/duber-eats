@@ -26,3 +26,15 @@ The backend for the UBER Eats Clone project. Built with NestJS.
 - category
 - address
 - coverImage
+
+## Restaurant CRUD:
+- See Categories
+- See Restaurants by Category (Pagination)
+- See Restaurants (pagination)
+- See Restaurant
+- Edit Restaurant
+- Delete Restaurant
+
+- Create Dish
+- Edit Dish
+- Delete Dish

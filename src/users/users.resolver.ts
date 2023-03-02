@@ -26,7 +26,7 @@ export class UsersResolver {
   async createAccount(
     @Args('input') createAccountInput: CreateAccountInput,
   ): Promise<CreateAccountOutput> {
-   return this.UserService.createAccount(createAccountInput);
+    return this.UserService.createAccount(createAccountInput);
   }
 
   @Mutation((returns) => LoginOutput)
@@ -58,7 +58,9 @@ export class UsersResolver {
   }
 
   @Mutation((returns) => VerifyEmailOutput)
-  async verifyEmail (@Args('input') { code }: VerifyEmailInput) : Promise<VerifyEmailOutput> {
+  async verifyEmail(
+    @Args('input') { code }: VerifyEmailInput,
+  ): Promise<VerifyEmailOutput> {
     return this.UserService.verifyEmail(code);
   }
 }

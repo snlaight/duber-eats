@@ -5,12 +5,12 @@ import { Restaurant } from '../entities/restaurant.entity';
 
 @InputType()
 export class CreateRestaurantInput extends PickType(Restaurant, [
-   'name',
-   'coverImg',
-   'address'
+  'name',
+  'coverImg',
+  'address',
 ]) {
-   @Field(type => String)
-   categoryName: string;
+  @Field((type) => String)
+  categoryName: string;
 }
 
 @ObjectType()
