@@ -20,3 +20,9 @@ The backend for the UBER Eats Clone project. Built with NestJS.
 - See Profile
 - Edit Profile
 - Verify Email
+
+## Restaurant Model:
+- name
+- category
+- address
+- coverImage
