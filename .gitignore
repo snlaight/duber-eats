@@ -4,3 +4,5 @@ dist
 coverage
 .DS_Store
 **/*.d.ts
+**/*.next
+**/*.vscode
