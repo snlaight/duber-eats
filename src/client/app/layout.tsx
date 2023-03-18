@@ -1,6 +1,6 @@
-
-import '@styles/globals.css';
-import { BaseLayout } from '@components';
+import '@/styles/globals.css';
+import '@/styles/styles.css';
+import { BaseLayout } from '@/components';
 
 export const metadata = {
   title: 'Duber Eats',
