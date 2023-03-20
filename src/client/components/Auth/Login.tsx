@@ -7,7 +7,8 @@ import Image from 'next/image';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 
-import { CustomInput, FormError } from '@/components';
+import { isLoggedInVar } from '@/utils/apollo';
+import { CustomInput, FormError, Button } from '@/components';
 import { LogoColorHorizontal } from '@/assets';
 import { LOGIN_MUTATION } from '@/utils/apollo/queries';
 import { login } from '@/__generated__/login';
@@ -23,7 +24,10 @@ type TLoginProps = {
 }
 
 const Login = ({ setFormType } : TLoginProps) => {
-  const { register, getValues, handleSubmit, formState: { errors } } = useForm<IForm>();
+  const { register, getValues, handleSubmit, formState: { errors, isValid } } = useForm<IForm>({
+    mode: 'onChange',
+  });
+  const [errorsFromServer, setErrorsFromServer] = React.useState<string | null>(null);
 
   const onCompleted = (data: login) => {
     const { login: { ok, token } } = data;
@@ -32,11 +36,13 @@ const Login = ({ setFormType } : TLoginProps) => {
       if (typeof window !== 'undefined') {
         localStorage.setItem('token', token || '');
       }
+      isLoggedInVar(true);
     }
   };
 
   const onError = (error: Error) => {
     console.log('error--->', error);
+    setErrorsFromServer(error.message);
   };
 
   const [loginMutation, { data: loginMutationResult, loading }] = useMutation<login>(LOGIN_MUTATION, { onCompleted, onError });
@@ -87,14 +93,15 @@ const Login = ({ setFormType } : TLoginProps) => {
   return (
     <div className='h-screen flex items-center justify-center'>
       <div className='bg-white w-full max-w-lg pt-10 pb-7 rounded-lg text-center shadow-sm shadow-[#1D3770]'>
-        <Image src={LogoColorHorizontal} alt='logo' className='items-center justify-center' />
+        <Image src={LogoColorHorizontal} alt='logo' className='items-center  mx-auto rounded justify-center' />
         <h3 className='text-2xl text-dubereats-primary'>
-          Log in
+          Welcome Back!
         </h3>
         <form
           onSubmit={handleSubmit(onSubmit)}
           className='grid gap-3 mt-5 px-5'
         >
+          {errorsFromServer && <FormError errorMessage={errorsFromServer} />}
           {React.Children.toArray(FormFields.map((field) => (
             <CustomInput
               id={field.id}
@@ -107,9 +114,9 @@ const Login = ({ setFormType } : TLoginProps) => {
               error={field.error}
             />
           )))}
-          <button type='submit' className='mt-3 btn'>
-            Log in
-          </button>
+          <div className='mt-3'>
+            <Button fullWidth isSubmit text='Log in' isClickable={isValid} loading={loading} />
+          </div>
           {loginMutationResult?.login.error && (
             <FormError errorMessage={loginMutationResult.login.error} />
           )}

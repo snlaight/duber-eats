@@ -1,13 +1,21 @@
-import React from 'react';
+'use client';
+
+/* eslint-disable no-shadow */
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Image from 'next/image';
+import { useMutation } from '@apollo/client';
 
 import { LogoColorHorizontal } from '@/assets';
-import { CustomInput } from '@/components';
+import { CustomInput, FormError, Button } from '@/components';
+import { UserRole } from '@/__generated__/globalTypes';
+import { createAccountMutation, createAccountMutationVariables } from '@/__generated__/createAccountMutation';
+import { CREATE_ACCOUNT_MUTATION } from '@/utils/apollo/queries';
 
 interface IForm {
     email: string;
     password: string;
+    role: UserRole;
   }
 
 type TLoginProps = {
@@ -15,9 +23,40 @@ type TLoginProps = {
 }
 
 const SignUp = ({ setFormType } : TLoginProps) => {
-  const { register, watch, handleSubmit, formState: { errors } } = useForm<IForm>();
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const { register, getValues, handleSubmit, formState: { errors, isValid } } = useForm<IForm>({
+    mode: 'onChange',
+    defaultValues: {
+      role: UserRole.Client,
+    },
+  });
+
+  const onCompleted = (data: createAccountMutation) => {
+    const { createAccount: { ok } } = data;
+    if (ok) {
+      setSuccessMessage('Account created! Please log in.');
+      console.log('Account created');
+    }
+  };
+
+  const [createAccountMutation, { data: createAccountMutationResult, loading }] = useMutation<createAccountMutation, createAccountMutationVariables>(CREATE_ACCOUNT_MUTATION, {
+    onCompleted,
+  });
+
   const onSubmit = () => {
-    console.log(watch());
+    console.log('submit');
+    if (!loading) {
+      const { email, password, role } = getValues();
+      createAccountMutation({
+        variables: {
+          createAccountInput: {
+            email,
+            password,
+            role,
+          },
+        },
+      });
+    }
   };
   const onInvalid = () => {
     console.log('invalid');
@@ -58,7 +97,7 @@ const SignUp = ({ setFormType } : TLoginProps) => {
       <div className='bg-white w-full max-w-lg pt-10 pb-7 rounded-lg text-center shadow-sm shadow-[#1D3770]'>
         <Image src={LogoColorHorizontal} alt='logo' className='items-center justify-center' />
         <h3 className='text-2xl text-dubereats-primary'>
-          Sign Up
+          {loading ? 'Loading...' : 'Sign Up'}
         </h3>
         <form
           onSubmit={handleSubmit(onSubmit)}
@@ -76,9 +115,25 @@ const SignUp = ({ setFormType } : TLoginProps) => {
               error={field.error}
             />
           )))}
-          <button type='submit' className='mt-3 btn capitalize'>
-            Sign up
-          </button>
+          <select name='role' {...register('role')} required className='input'>
+            {React.Children.toArray(Object.keys(UserRole).map((role) => (
+              <option value={role}>{role}</option>
+            )))}
+          </select>
+          <div className='mt-3 transition-all'>
+            {successMessage?.length
+              ? (
+                <p>
+                  {successMessage}
+                </p>
+              )
+              : <Button fullWidth isSubmit text={successMessage || 'Sign up'} isClickable={isValid} loading={loading} />}
+
+          </div>
+
+          {createAccountMutationResult?.createAccount.error && (
+          <FormError errorMessage={createAccountMutationResult.createAccount.error} />
+          )}
         </form>
         <p>
           Already have an account? {' '}

@@ -9,3 +9,12 @@ mutation login($loginInput: LoginInput!) {
     }
 }
 `;
+
+export const CREATE_ACCOUNT_MUTATION = gql`
+    mutation createAccountMutation($createAccountInput: CreateAccountInput!) {
+        createAccount(input: $createAccountInput) {
+            ok
+            error
+        }
+    }
+`;
