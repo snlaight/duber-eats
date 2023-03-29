@@ -1,5 +1,10 @@
 'use client';
 
+import React, { FC } from 'react';
+import { ToastContainer } from 'react-toastify';
+
+import 'react-toastify/dist/ReactToastify.css';
+
 import { ApolloProvider } from '@apollo/client';
 import { client } from '@/utils/apollo';
 import LoggedIn from './LoggedIn';
@@ -8,19 +13,20 @@ type Props = {
     children: React.ReactNode;
 }
 
-const ProviderLayout = ({ children }: Props) => (
+const ProviderLayout: FC<Props> = ({ children }) => (
   <ApolloProvider client={client}>
+    <ToastContainer />
     {children}
   </ApolloProvider>
 );
 
-const Layout = ({ children }: Props) => (
+const Layout: FC<Props> = ({ children }) => (
   <ProviderLayout>
-    <body>
+    <div>
       <LoggedIn>
         {children}
       </LoggedIn>
-    </body>
+    </div>
   </ProviderLayout>
 );
 

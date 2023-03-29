@@ -1,10 +1,10 @@
-import React from 'react';
+import React, { FC } from 'react';
 
 interface IFormErrorProps {
   errorMessage: string
 }
 
-const FormError: React.FC<IFormErrorProps> = ({ errorMessage }) => (
+const FormError: FC<IFormErrorProps> = ({ errorMessage }) => (
   <span className='font-medium text-red-500'>
     {errorMessage}
   </span>

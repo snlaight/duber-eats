@@ -2,12 +2,13 @@
 
 'use client';
 
-import React from 'react';
+import React, { FC } from 'react';
 import Image from 'next/image';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { useMutation } from '@apollo/client';
 
-import { isLoggedInVar } from '@/utils/apollo';
+import { isLoggedInVar, authTokenVar } from '@/utils/apollo';
+import { LOCAL_STORAGE_TOKEN } from '@/utils/constants';
 import { CustomInput, FormError, Button } from '@/components';
 import { LogoColorHorizontal } from '@/assets';
 import { LOGIN_MUTATION } from '@/utils/apollo/queries';
@@ -23,7 +24,7 @@ type TLoginProps = {
     setFormType: (isLogin: boolean) => void;
 }
 
-const Login = ({ setFormType } : TLoginProps) => {
+const Login: FC<TLoginProps> = ({ setFormType }) => {
   const { register, getValues, handleSubmit, formState: { errors, isValid } } = useForm<IForm>({
     mode: 'onChange',
   });
@@ -31,12 +32,12 @@ const Login = ({ setFormType } : TLoginProps) => {
 
   const onCompleted = (data: login) => {
     const { login: { ok, token } } = data;
-    console.log('data--->', data);
-    if (ok) {
+    if (ok && token) {
       if (typeof window !== 'undefined') {
-        localStorage.setItem('token', token || '');
+        localStorage.setItem(LOCAL_STORAGE_TOKEN, token);
       }
       isLoggedInVar(true);
+      authTokenVar(token);
     }
   };
 
@@ -121,7 +122,7 @@ const Login = ({ setFormType } : TLoginProps) => {
             <FormError errorMessage={loginMutationResult.login.error} />
           )}
         </form>
-        <p>
+        <p className='text-gray-600 text-xs my-3'>
           Don&apos;t have an account? &nbsp;
           <span
             onClick={() => setFormType(false)}

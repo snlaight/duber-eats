@@ -1,21 +1,24 @@
 
-import React from 'react';
-import { useReactiveVar } from '@apollo/client';
+import React, { FC } from 'react';
+import { useReactiveVar, useQuery } from '@apollo/client';
 
 import { isLoggedInVar } from '@/utils/apollo';
-import { AuthForm } from '..';
+import { useMe } from '@/utils/hooks/useMe';
+import { AuthForm, Header } from '..';
 
 type Props = {
     children: React.ReactNode;
 }
 
-const LoggedIn = ({ children }: Props) => {
+const LoggedIn: FC<Props> = ({ children }) => {
   const isLoggedIn = useReactiveVar(isLoggedInVar);
+  const { data, loading, error } = useMe();
   return (
     <div>
       {isLoggedIn ? (
         <>
-          <h1>Logged In</h1>
+          <Header />
+          <h1>Logged In: {data?.me.email}</h1>
           <button type='button' onClick={() => isLoggedInVar(false)}>Log Out</button>
           {children}
         </>

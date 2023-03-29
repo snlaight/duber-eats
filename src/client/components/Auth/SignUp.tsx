@@ -1,10 +1,12 @@
 'use client';
 
 /* eslint-disable no-shadow */
-import React, { useState } from 'react';
+import React, { FC, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { useMutation } from '@apollo/client';
+import { toast } from 'react-toastify';
 
 import { LogoColorHorizontal } from '@/assets';
 import { CustomInput, FormError, Button } from '@/components';
@@ -22,8 +24,7 @@ type TLoginProps = {
     setFormType: (isLogin: boolean) => void;
 }
 
-const SignUp = ({ setFormType } : TLoginProps) => {
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+const SignUp : FC<TLoginProps> = ({ setFormType }) => {
   const { register, getValues, handleSubmit, formState: { errors, isValid } } = useForm<IForm>({
     mode: 'onChange',
     defaultValues: {
@@ -34,8 +35,10 @@ const SignUp = ({ setFormType } : TLoginProps) => {
   const onCompleted = (data: createAccountMutation) => {
     const { createAccount: { ok } } = data;
     if (ok) {
-      setSuccessMessage('Account created! Please log in.');
-      console.log('Account created');
+      toast.success('Account created! Please wait while we redirect you to the login page...');
+      setTimeout(() => {
+        setFormType(true);
+      }, 5000);
     }
   };
 
@@ -44,7 +47,6 @@ const SignUp = ({ setFormType } : TLoginProps) => {
   });
 
   const onSubmit = () => {
-    console.log('submit');
     if (!loading) {
       const { email, password, role } = getValues();
       createAccountMutation({
@@ -121,13 +123,7 @@ const SignUp = ({ setFormType } : TLoginProps) => {
             )))}
           </select>
           <div className='mt-3 transition-all'>
-            {successMessage?.length
-              ? (
-                <p>
-                  {successMessage}
-                </p>
-              )
-              : <Button fullWidth isSubmit text={successMessage || 'Sign up'} isClickable={isValid} loading={loading} />}
+            <Button fullWidth isSubmit text='Sign Up' isClickable={isValid} loading={loading} />
 
           </div>
 
@@ -135,7 +131,7 @@ const SignUp = ({ setFormType } : TLoginProps) => {
           <FormError errorMessage={createAccountMutationResult.createAccount.error} />
           )}
         </form>
-        <p>
+        <p className='text-gray-600 text-xs my-3'>
           Already have an account? {' '}
           <span
             onClick={() => setFormType(true)}

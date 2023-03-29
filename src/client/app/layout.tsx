@@ -13,9 +13,11 @@ const RootLayout = ({
       children: React.ReactNode
     }) => (
       <html lang='en'>
-        <BaseLayout>
-          <body>{children}</body>
-        </BaseLayout>
+        <body>
+          <BaseLayout>
+            {children}
+          </BaseLayout>
+        </body>
       </html>
 );
 

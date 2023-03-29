@@ -161,6 +161,7 @@ export class RestaurantService {
         categories,
       };
     } catch (error) {
+      console.log(error);
       return {
         ok: false,
         error: 'Could not load categories',

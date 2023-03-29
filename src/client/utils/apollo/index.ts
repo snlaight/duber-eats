@@ -1,13 +1,27 @@
 import { ApolloClient, InMemoryCache, makeVar, createHttpLink } from '@apollo/client';
+import { setContext } from '@apollo/client/link/context';
 import crossFetch from 'cross-fetch';
 
-export const isLoggedInVar = makeVar(false);
+import { LOCAL_STORAGE_TOKEN } from '@/utils/constants';
+
+const token = localStorage.getItem(LOCAL_STORAGE_TOKEN);
+export const isLoggedInVar = makeVar(Boolean(token));
+export const authTokenVar = makeVar(token);
+
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4000/graphql',
+  fetch: crossFetch,
+});
+
+const authLink = setContext((_, { headers }) => ({
+  headers: {
+    ...headers,
+    'x-jwt': authTokenVar() || '',
+  },
+}));
 
 export const client = new ApolloClient({
-  link: createHttpLink({
-    uri: 'http://localhost:4000/graphql',
-    fetch: crossFetch,
-  }),
+  link: authLink.concat(httpLink),
   cache: new InMemoryCache({
     typePolicies: {
       Query: {
@@ -15,6 +29,11 @@ export const client = new ApolloClient({
           isLoggedIn: {
             read() {
               return isLoggedInVar();
+            },
+          },
+          token: {
+            read() {
+              return authTokenVar();
             },
           },
         },
